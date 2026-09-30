@@ -1,0 +1,122 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 4,
+  "fields": {
+    "title": "Video cards",
+    "parent": null
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 5,
+  "fields": {
+    "title": "Gaming",
+    "parent": 4
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 6,
+  "fields": {
+    "title": "Processors",
+    "parent": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "category": 5,
+    "title": "RTX 4070 TI",
+    "description": "The NVIDIA GeForce RTX 4070 Ti is a high-performance graphics card powered by the ultra-efficient Ada Lovelace architecture.\r\nGraphics card, 12 GB",
+    "price": "1200.00",
+    "count": 10,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 5,
+    "sold": 20,
+    "created_at": "2026-09-30T06:49:58.907Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 2,
+  "fields": {
+    "category": 5,
+    "title": "RTX 4060",
+    "description": "Graphics card, 8 GB",
+    "price": "300.00",
+    "count": 15,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 8,
+    "sold": 5,
+    "created_at": "2026-09-30T06:52:30.024Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 3,
+  "fields": {
+    "category": 5,
+    "title": "RX 7800 XT",
+    "description": "Graphics card, 16 GB",
+    "price": "500.00",
+    "count": 7,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 8,
+    "sold": 30,
+    "created_at": "2026-09-30T06:52:58.550Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 4,
+  "fields": {
+    "category": 6,
+    "title": "intel core i5-12400f",
+    "description": "The Intel Core i5-12400F is a popular and affordable 6‑core 12th‑generation processor from Intel (Alder Lake architecture) without integrated graphics, released in early 2022. \r\n6 cores, 2.5 - 4.4 GHz",
+    "price": "180.00",
+    "count": 25,
+    "free_delivery": true,
+    "limited": false,
+    "sort_index": 3,
+    "sold": 40,
+    "created_at": "2026-09-30T06:56:04.123Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 5,
+  "fields": {
+    "category": 6,
+    "title": "Ryzen 7",
+    "description": "8 cores, 3.8 GHz",
+    "price": "260.00",
+    "count": 12,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 3,
+    "sold": 35,
+    "created_at": "2026-09-30T06:56:25.687Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 6,
+  "fields": {
+    "category": 6,
+    "title": "Core i7",
+    "description": "8 cores, 4.7 GHz",
+    "price": "320.00",
+    "count": 6,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 8,
+    "sold": 9,
+    "created_at": "2026-09-30T06:56:47.202Z"
+  }
+}
+]
