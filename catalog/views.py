@@ -1,11 +1,51 @@
 import json
 
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 from .models import Category, Product
 
 PLACEHOLDER = "/static/frontend/assets/img/content/home/card.jpg"
+
+SORT_FIELDS = {"price": "price", "date": "created_at"}
+
+
+def catalog(request):
+    params = request.GET
+    products = Product.objects.all()
+    category_id = params.get("category")
+    if category_id:
+        products = products.filter(
+            Q(category_id=category_id) | Q(category__parent_id=category_id)
+        )
+    name = params.get("filter[name]")
+    if name:
+        products = products.filter(title__icontains=name)
+    products = products.filter(
+        price__gte=params.get("filter[minPrice]", 0),
+        price__lte=params.get("filter[maxPrice]", 1000000),
+    )
+    if params.get("filter[freeDelivery]") == "true":
+        products = products.filter(free_delivery=True)
+    if params.get("filter[available]") == "true":
+        products = products.filter(count__gt=0)
+    field = SORT_FIELDS.get(params.get("sort"), "created_at")
+    if params.get("sortType") == "dec":
+        field = "-" + field
+    paginator = Paginator(products.order_by(field), int(params.get("limit", 20)))
+    page = paginator.get_page(params.get("currentPage", 1))
+    return JsonResponse({
+        "items": [product_short(product) for product in page],
+        "currentPage": page.number,
+        "lastPage": paginator.num_pages,
+    })
+
+
+# noinspection PyUnusedLocal
+def tags(request):
+    return JsonResponse([], safe=False)
 
 
 def serialize_category(category: Category):
