@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'frontend',
     'catalog',
+    'orders',
 ]
 
 MIDDLEWARE = [
