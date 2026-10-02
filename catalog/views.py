@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from .models import Category, Product
 
 PLACEHOLDER = "/static/frontend/assets/img/content/home/card.jpg"
-
+CATEGORY_PLACEHOLDER = "/static/frontend/assets/img/icons/allDep.svg"
 SORT_FIELDS = {"price": "price", "date": "created_at"}
 
 
@@ -53,8 +53,8 @@ def serialize_category(category: Category):
         "id": category.pk,
         "title": category.title,
         "image": {
-            "src": category.image.url if category.image else "",
-            "alt": category.title
+            "src": category.image.url if category.image else CATEGORY_PLACEHOLDER,
+            "alt": category.title,
         },
     }
 
