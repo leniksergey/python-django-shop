@@ -4,6 +4,11 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 
+class CategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
+
+
 class Category(models.Model):
     id: int
     title = models.CharField(max_length=255)
@@ -16,9 +21,18 @@ class Category(models.Model):
     )
     subcategories: models.QuerySet['Category']
     image = models.ImageField(upload_to="categories/", blank=True)
+    archived = models.BooleanField(default=False)
+
+    objects = CategoryManager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return self.title
+
+
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
 
 
 class Product(models.Model):
@@ -38,6 +52,9 @@ class Product(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
+    archived = models.BooleanField(default=False)
+    objects = ProductManager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return self.title
@@ -50,4 +67,4 @@ class ProductImage(models.Model):
     image = models.ImageField(upload_to="products/")
 
     def __str__(self):
-        return f"Фото: {self.product}"
+        return f"Photo: {self.product}"

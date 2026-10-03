@@ -5,7 +5,6 @@ from django.http import JsonResponse
 from .models import Profile
 
 
-# --- Авторизация ---
 
 def sign_in(request):
     if request.method != "POST":
@@ -33,7 +32,7 @@ def sign_up(request):
     user = User.objects.create_user(
         username=username, password=password, first_name=body.get("name", "")
     )
-    Profile.objects.create(user=user)  # Создаем профиль при регистрации
+    Profile.objects.create(user=user)
     login(request, user)
     return JsonResponse({})
 
@@ -43,13 +42,11 @@ def sign_out(request):
     return JsonResponse({})
 
 
-# --- Профиль пользователя ---
 
 def profile_view(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
-    # Гарантируем наличие объекта Profile
     profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "GET":
@@ -128,12 +125,11 @@ def change_password_view(request):
         new_password = body.get("newPassword")
 
         if not request.user.check_password(current_password):
-            return JsonResponse({"error": "Неверный текущий пароль"}, status=400)
+            return JsonResponse({"error": "Invalid current password"}, status=400)
 
         request.user.set_password(new_password)
         request.user.save()
 
-        # Сохраняем сессию пользователя, чтобы он не разлогинился
         update_session_auth_hash(request, request.user)
 
         return JsonResponse({})
