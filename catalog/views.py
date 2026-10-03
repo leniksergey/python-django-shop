@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from .models import Category, Product
 
 PLACEHOLDER = "/static/frontend/assets/img/content/home/card.jpg"
-
+CATEGORY_PLACEHOLDER = "/static/frontend/assets/img/icons/allDep.svg"
 SORT_FIELDS = {"price": "price", "date": "created_at"}
 
 
@@ -52,7 +52,10 @@ def serialize_category(category: Category):
     return {
         "id": category.pk,
         "title": category.title,
-        "image": {"src": "", "alt": category.title},
+        "image": {
+            "src": category.image.url if category.image else CATEGORY_PLACEHOLDER,
+            "alt": category.title,
+        },
     }
 
 
@@ -80,29 +83,11 @@ def product_short(product: Product):
         "title": product.title,
         "description": product.description,
         "freeDelivery": product.free_delivery,
-        "images": [{"src": PLACEHOLDER, "alt": product.title}],
+        "images": product_images(product),
         "tags": [],
         "reviews": 0,
         "rating": 0,
     }
-
-
-# noinspection PyUnusedLocal
-def popular(request):
-    products = Product.objects.order_by("-sort_index", "-sold")[:8]
-    return JsonResponse([product_short(product) for product in products], safe=False)
-
-
-# noinspection PyUnusedLocal
-def limited(request):
-    products = Product.objects.filter(limited=True)[:16]
-    return JsonResponse([product_short(product) for product in products], safe=False)
-
-
-# noinspection PyUnusedLocal
-def banners(request):
-    products = Product.objects.order_by("-created_at")[:3]
-    return JsonResponse([product_short(product) for product in products], safe=False)
 
 
 # noinspection PyUnusedLocal
@@ -116,6 +101,14 @@ def product_detail(request, product_id):
         "specifications": [],
     })
     return JsonResponse(data)
+
+
+def product_images(product: Product):
+    images = [
+        {"src": image.image.url, "alt": product.title}
+        for image in product.images.all()
+    ]
+    return images or [{"src": PLACEHOLDER, "alt": product.title}]
 
 
 def basket_data(request):
@@ -144,3 +137,21 @@ def basket(request):
                 del cart[product_key]
         request.session["basket"] = cart
     return JsonResponse(basket_data(request), safe=False)
+
+
+# noinspection PyUnusedLocal
+def popular(request):
+    products = Product.objects.order_by("-sort_index", "-sold")[:8]
+    return JsonResponse([product_short(product) for product in products], safe=False)
+
+
+# noinspection PyUnusedLocal
+def limited(request):
+    products = Product.objects.filter(limited=True)[:16]
+    return JsonResponse([product_short(product) for product in products], safe=False)
+
+
+# noinspection PyUnusedLocal
+def banners(request):
+    products = Product.objects.order_by("-created_at")[:3]
+    return JsonResponse([product_short(product) for product in products], safe=False)
