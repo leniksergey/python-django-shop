@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from catalog.models import Product
 from catalog.views import product_short
 from .models import Order, OrderItem
+from .tasks import process_payment
 
 ORDER_FIELDS = {
     "fullName": "full_name",
@@ -93,11 +94,11 @@ def payment(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
     body = json.loads(request.body)
     number = "".join(char for char in str(body.get("number", "")) if char.isdigit())
-    if not is_card_valid(number):
-        order.status = Order.Status.FAILED
-        order.save()
+    try:
+        paid = process_payment.delay(order.pk, number).get(timeout=10)
+    except Exception:
+        paid = False
+    if not paid:
         return JsonResponse({"error": "payment failed"}, status=500)
-    order.status = Order.Status.PAID
-    order.save()
     request.session["basket"] = {}
     return JsonResponse({})
