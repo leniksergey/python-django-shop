@@ -38,6 +38,8 @@ INSTALLED_APPS = [
 
     'frontend',
     'catalog',
+    'orders',
+    'accounts',
 ]
 
 MIDDLEWARE = [
