@@ -1,13 +1,17 @@
 import json
+import logging
 
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 
-from catalog.models import Product
 from catalog.views import product_short
+from .forms import OrderCreateForm, OrderUpdateForm, PaymentForm
 from .models import Order, OrderItem
 from .tasks import process_payment
+
+logger = logging.getLogger(__name__)
 
 ORDER_FIELDS = {
     "fullName": "full_name",
@@ -20,18 +24,41 @@ ORDER_FIELDS = {
 }
 
 
+def _parse_json(request):
+    try:
+        return json.loads(request.body or "{}"), None
+    except json.JSONDecodeError:
+        return None, JsonResponse({"error": "invalid json"}, status=400)
+
+
 def serialize_order(order):
     products = []
     for item in order.items.select_related("product"):
         data = product_short(item.product)
         data.update(price=float(item.price), count=item.count)
         products.append(data)
+
+    full_name = order.full_name
+    email = order.email
+    phone = order.phone
+
+    if order.user_id:
+        user = order.user
+        if not email:
+            email = user.email or ""
+        if not full_name:
+            full_name = user.get_full_name() or user.username
+        if not phone:
+            profile = getattr(user, "profile", None)
+            if profile:
+                phone = profile.phone or ""
+
     return {
         "id": order.pk,
         "createdAt": order.created_at.strftime("%Y-%m-%d %H:%M"),
-        "fullName": order.full_name,
-        "email": order.email,
-        "phone": order.phone,
+        "fullName": full_name,
+        "email": email,
+        "phone": phone,
         "deliveryType": order.delivery_type,
         "paymentType": order.payment_type,
         "totalCost": float(order.total_cost),
@@ -44,13 +71,30 @@ def serialize_order(order):
 
 def order_detail(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
+
     if request.method == "POST":
-        body = json.loads(request.body)
-        for key, attribute in ORDER_FIELDS.items():
-            if key in body:
-                setattr(order, attribute, body[key])
-        order.status = Order.Status.ACCEPTED
-        order.save()
+        if order.user_id is not None and order.user_id != request.user.id:
+            return JsonResponse({"error": "forbidden"}, status=403)
+
+        if order.status in (Order.Status.PAID, Order.Status.FAILED):
+            return JsonResponse({"error": "order is locked"}, status=409)
+
+        body, err = _parse_json(request)
+        if err:
+            return err
+
+        form = OrderUpdateForm(body)
+        if not form.is_valid():
+            return JsonResponse(
+                {"error": "validation failed", "errors": form.errors}, status=400
+            )
+
+        with transaction.atomic():
+            for key, attribute in ORDER_FIELDS.items():
+                setattr(order, attribute, form.cleaned_data[key])
+            order.status = Order.Status.ACCEPTED
+            order.save(update_fields=[*ORDER_FIELDS.values(), "status"])
+
     data = serialize_order(order)
     if request.method == "POST":
         data["orderId"] = order.pk
@@ -63,42 +107,82 @@ def orders(request):
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
     user_orders = Order.objects.filter(user=request.user).order_by("-created_at")
-    return JsonResponse([serialize_order(order) for order in user_orders], safe=False)
+    return JsonResponse([serialize_order(o) for o in user_orders], safe=False)
 
 
+@require_POST
 def create_order(request):
-    items = json.loads(request.body)
-    products = Product.objects.in_bulk([item["id"] for item in items])
-    if not items or len(products) != len({item["id"] for item in items}):
-        return JsonResponse({"error": "invalid items"}, status=400)
+    body, err = _parse_json(request)
+    if err:
+        return err
+
+    form = OrderCreateForm({"items": body})
+    if not form.is_valid():
+        return JsonResponse(
+            {"error": "validation failed", "errors": form.errors}, status=400
+        )
+
     user = request.user if request.user.is_authenticated else None
+
+    phone = ""
+    if user:
+        profile = getattr(user, "profile", None)
+        if profile:
+            phone = profile.phone or ""
+
     with transaction.atomic():
-        order = Order.objects.create(user=user)
+        order = Order.objects.create(
+            user=user,
+            email=user.email if user else "",
+            full_name=(user.get_full_name() or user.username) if user else "",
+            phone=phone,
+        )
         OrderItem.objects.bulk_create(
-            OrderItem(
-                order=order,
-                product=products[item["id"]],
-                price=products[item["id"]].price,
-                count=item["count"],
-            )
-            for item in items
+            OrderItem(order=order, product=product, price=product.price, count=count)
+            for product, count in form.cleaned_data["items"]
         )
     return JsonResponse({"orderId": order.pk})
 
 
-def is_card_valid(number):
-    return number.isdigit() and int(number) % 2 == 0
-
-
+@require_POST
 def payment(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
-    body = json.loads(request.body)
-    number = "".join(char for char in str(body.get("number", "")) if char.isdigit())
+
+    if order.user_id is not None and order.user_id != request.user.id:
+        return JsonResponse({"error": "forbidden"}, status=403)
+
+    if order.status == Order.Status.PAID:
+        return JsonResponse({"error": "already paid"}, status=409)
+    if order.status not in (Order.Status.ACCEPTED, Order.Status.FAILED):
+        return JsonResponse({"error": "order not accepted"}, status=409)
+
+    body, err = _parse_json(request)
+    if err:
+        return err
+
+    form = PaymentForm(body)
+    if not form.is_valid():
+        return JsonResponse(
+            {"error": "validation failed", "errors": form.errors}, status=400
+        )
+
+    if order.total_cost <= 0:
+        return JsonResponse({"error": "invalid amount"}, status=400)
+
     try:
-        paid = process_payment.delay(order.pk, number).get(timeout=10)
+        paid = process_payment.apply_async(
+            args=(order.pk, form.cleaned_data["number"]), expires=15
+        ).get(timeout=10)
     except Exception:
-        paid = False
+        logger.exception("payment task failed for order %s", order.pk)
+        return JsonResponse({"error": "payment service unavailable"}, status=503)
+
     if not paid:
+        order.status = Order.Status.FAILED
+        order.save(update_fields=["status"])
         return JsonResponse({"error": "payment failed"}, status=500)
+
+    order.status = Order.Status.PAID
+    order.save(update_fields=["status"])
     request.session["basket"] = {}
-    return JsonResponse({})
+    return JsonResponse({"status": "ok", "orderId": order.pk})

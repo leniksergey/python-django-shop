@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.db import models
+from django.core.validators import MinValueValidator
 
 from catalog.models import Product
+from .validators import phone_validator
 
 
 class Order(models.Model):
@@ -18,7 +20,11 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     full_name = models.CharField(max_length=200, blank=True)
     email = models.EmailField(blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        validators=[phone_validator],   # ← добавили
+    )
     delivery_type = models.CharField(max_length=20, blank=True)
     payment_type = models.CharField(max_length=20, blank=True)
     city = models.CharField(max_length=100, blank=True)
@@ -32,5 +38,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    count = models.PositiveIntegerField()
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2,
+        validators=[MinValueValidator(0)],   # ← бонусом
+    )
+    count = models.PositiveIntegerField(validators=[MinValueValidator(1)])  # ← бонусом
