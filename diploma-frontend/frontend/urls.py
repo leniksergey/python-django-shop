@@ -8,8 +8,10 @@ urlpatterns = [
     path('catalog/', TemplateView.as_view(template_name="frontend/catalog.html")),
     path('catalog/<int:id>/', TemplateView.as_view(template_name="frontend/catalog.html")),
     path('history-order/', TemplateView.as_view(template_name="frontend/historyorder.html")),
-    path('order-detail/<int:id>/', TemplateView.as_view(template_name="frontend/oneorder.html")),
-    path('orders/<int:id>/', TemplateView.as_view(template_name="frontend/order.html")),
+    # Детали заказа — просмотр (список, без формы):
+    path('orders/<int:id>/', TemplateView.as_view(template_name="frontend/oneorder.html")),
+    # Форма создания/редактирования заказа:
+    path('order-detail/<int:id>/', TemplateView.as_view(template_name="frontend/order.html")),
     path('payment/<int:id>/', TemplateView.as_view(template_name="frontend/payment.html")),
     path('payment-someone/', TemplateView.as_view(template_name="frontend/paymentsomeone.html")),
     path('product/<int:id>/', TemplateView.as_view(template_name="frontend/product.html")),
