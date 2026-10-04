@@ -28,6 +28,23 @@ python manage.py runserver
 
 Сайт: http://127.0.0.1:8000, админка: http://127.0.0.1:8000/admin/
 
+
+## Валидация
+
+Все правила — в [docs/VALIDATION.md](docs/VALIDATION.md).
+
+Три уровня:
+- **Frontend (Vue)** — ошибки при вводе, под полями
+- **Backend (Django Forms)** — `OrderCreateForm`, `OrderUpdateForm`, `PaymentForm`
+- **Модель (validators)** — регулярки для телефона, минимальные значения
+
+Тестовые карты (Luhn-валидные):
+- `4242424242424242`
+- `4111111111111111`
+- `5555555555554444`
+
+Срок действия: `12/2027`, CVV: `123`.
+
 ## Очередь оплаты
 
 Оплата обрабатывается в фоне через Celery + Redis. Redis запускается в Docker:
