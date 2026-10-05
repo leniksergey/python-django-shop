@@ -7,7 +7,7 @@ click==8.5.0
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.4.0
-diploma-frontend @ file:///home/vboxuser/PycharmProjects/python_django_diploma/diploma-frontend/dist/diploma-frontend-0.6.tar.gz#sha256=3a6b1203724b256946919b4d65b362b005ae6a9e1e93d8d765e96aa6a92764ac
+diploma-frontend @ file:///home/vboxuser/PycharmProjects/python_django_diploma/diploma-frontend/dist/diploma-frontend-0.6.tar.gz#sha256=8917f7e16ba9aa84b6577867b69e85596fd6c208acd78058c0142ea461775bbe
 Django==6.1.1
 django-filter==26.1
 django-stubs==6.1.1
