@@ -14,7 +14,7 @@ var mix = {
 			return { ordinary: 'Обычная', express: 'Экспресс' }[type] || type || '—'
 		},
 		paymentLabel(type) {
-			return { online: 'Онлайн картой', someone: 'Со чужого счёта' }[type] || type || '—'
+			return { online: 'Онлайн картой', someone: 'С чужого счёта' }[type] || type || '—'
 		},
 		statusLabel(status) {
 			return {
