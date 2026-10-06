@@ -26,6 +26,10 @@ class Category(models.Model):
     objects = CategoryManager()
     all_objects = models.Manager()
 
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+
     def __str__(self):
         return self.title
 
@@ -56,6 +60,10 @@ class Product(models.Model):
     objects = ProductManager()
     all_objects = models.Manager()
 
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+
     def __str__(self):
         return self.title
 
@@ -66,5 +74,42 @@ class ProductImage(models.Model):
     )
     image = models.ImageField(upload_to="products/")
 
+    class Meta:
+        verbose_name = "Изображение товара"
+        verbose_name_plural = "Изображения товаров"
+
     def __str__(self):
         return f"Photo: {self.product}"
+
+
+from django.conf import settings
+
+
+class Review(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="reviews",
+        verbose_name="Товар",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="reviews", verbose_name="Пользователь",
+    )
+    text = models.TextField(verbose_name="Текст отзыва")
+    rate = models.PositiveSmallIntegerField(
+        choices=[(i, str(i)) for i in range(1, 6)],
+        default=5,
+        verbose_name="Оценка",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    archived = models.BooleanField(default=False, verbose_name="Архивирован")
+
+    objects = ProductManager()
+    all_objects = models.Manager()
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.user} → {self.product} ({self.rate})"

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Review
 
 
 class ProductImageInline(admin.TabularInline):
@@ -39,8 +39,10 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def image_preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px;" />', obj.image.url)
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px;" />',
+                               obj.image.url)
         return "No icon"
+
     image_preview.short_description = "Icon"
 
 
@@ -70,5 +72,32 @@ class ProductAdmin(admin.ModelAdmin):
         queryset.update(archived=True)
 
     @admin.action(description="Unarchive selected products")
+    def unarchive(self, request, queryset):
+        queryset.update(archived=False)
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ("id", "product", "user", "rate", "created_at", "archived")
+    list_filter = ("rate", "archived", "created_at")
+    search_fields = ("product__title", "user__username", "text")
+    readonly_fields = ("created_at",)
+    actions = ["archive", "unarchive"]
+
+    def get_queryset(self, request):
+        return Review.all_objects.all()
+
+    def delete_model(self, request, obj):
+        obj.archived = True
+        obj.save()
+
+    def delete_queryset(self, request, queryset):
+        queryset.update(archived=True)
+
+    @admin.action(description="Archive selected reviews")
+    def archive(self, request, queryset):
+        queryset.update(archived=True)
+
+    @admin.action(description="Unarchive selected reviews")
     def unarchive(self, request, queryset):
         queryset.update(archived=False)
