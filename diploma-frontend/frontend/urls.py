@@ -13,7 +13,7 @@ urlpatterns = [
     # Форма создания/редактирования заказа:
     path('order-detail/<int:id>/', TemplateView.as_view(template_name="frontend/order.html")),
     path('payment/<int:id>/', TemplateView.as_view(template_name="frontend/payment.html")),
-    path('payment-someone/', TemplateView.as_view(template_name="frontend/paymentsomeone.html")),
+    path('payment-someone/<int:id>/', TemplateView.as_view(template_name="frontend/paymentsomeone.html")),
     path('product/<int:id>/', TemplateView.as_view(template_name="frontend/product.html")),
     path('profile/', TemplateView.as_view(template_name="frontend/profile.html")),
     path('progress-payment/', TemplateView.as_view(template_name="frontend/progressPayment.html")),

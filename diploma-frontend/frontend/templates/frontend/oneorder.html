@@ -77,7 +77,7 @@
                       <div class="Cart-desc">${ product.description }$</div>
                     </div>
                     <div class="Cart-block Cart-block_price">
-                      <div class="Cart-price">${ product.price }$$</div>
+                      <div class="Cart-price">${ product.price }$ ₽</div>
                     </div>
                   </div>
                   <div class="Cart-block Cart-block_row">
@@ -87,7 +87,7 @@
                 <div class="Cart-total">
                   <div class="Cart-block Cart-block_total">
                     <strong class="Cart-title">Итого:</strong>
-                    <span class="Cart-price">${ totalCost }$$</span>
+                    <span class="Cart-price">${ totalCost }$ ₽</span>
                   </div>
                   <div v-if="status === 'new'" class="Cart-block">
                     <a class="btn btn_primary btn_lg" :href="`/order-detail/${orderId}/`">
