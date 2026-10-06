@@ -21,6 +21,7 @@ ORDER_FIELDS = {
     "paymentType": "payment_type",
     "city": "city",
     "address": "address",
+    "comment": "comment",
 }
 
 
@@ -61,10 +62,14 @@ def serialize_order(order):
         "phone": phone,
         "deliveryType": order.delivery_type,
         "paymentType": order.payment_type,
+        "itemsCost": float(order.items_total),
+        "deliveryCost": float(order.delivery_cost),
         "totalCost": float(order.total_cost),
         "status": order.status,
+        "paymentError": order.payment_error or None,
         "city": order.city,
         "address": order.address,
+        "comment": order.comment,
         "products": products,
     }
 
@@ -76,7 +81,9 @@ def order_detail(request, order_id):
         if order.user_id is not None and order.user_id != request.user.id:
             return JsonResponse({"error": "forbidden"}, status=403)
 
-        if order.status in (Order.Status.PAID, Order.Status.FAILED):
+        # Пока заказ не оплачен — можно редактировать.
+        # Но редактирование запрещено, если статус PAID.
+        if order.status == Order.Status.PAID:
             return JsonResponse({"error": "order is locked"}, status=409)
 
         body, err = _parse_json(request)
@@ -170,19 +177,41 @@ def payment(request, order_id):
         return JsonResponse({"error": "invalid amount"}, status=400)
 
     try:
-        paid = process_payment.apply_async(
+        result = process_payment.apply_async(
             args=(order.pk, form.cleaned_data["number"]), expires=15
         ).get(timeout=10)
     except Exception:
         logger.exception("payment task failed for order %s", order.pk)
+        order.status = Order.Status.FAILED
+        order.payment_error = "Платёжный сервис недоступен, попробуйте позже"
+        order.save(update_fields=["status", "payment_error"])
         return JsonResponse({"error": "payment service unavailable"}, status=503)
 
-    if not paid:
+    # process_payment может вернуть:
+    #   True / False
+    #   или строку с текстом ошибки
+    #   или словарь {"success": bool, "error": str}
+    if isinstance(result, dict):
+        success = result.get("success", False)
+        error_text = result.get("error", "")
+    elif isinstance(result, str):
+        success = False
+        error_text = result
+    else:
+        success = bool(result)
+        error_text = "" if success else "Платёж отклонён платёжной системой"
+
+    if not success:
         order.status = Order.Status.FAILED
-        order.save(update_fields=["status"])
-        return JsonResponse({"error": "payment failed"}, status=500)
+        order.payment_error = error_text or "Ошибка оплаты"
+        order.save(update_fields=["status", "payment_error"])
+        return JsonResponse(
+            {"error": "payment failed", "paymentError": order.payment_error},
+            status=500,
+        )
 
     order.status = Order.Status.PAID
-    order.save(update_fields=["status"])
+    order.payment_error = ""
+    order.save(update_fields=["status", "payment_error"])
     request.session["basket"] = {}
     return JsonResponse({"status": "ok", "orderId": order.pk})
