@@ -21,19 +21,15 @@
           <div class="ProductCard">
             <div class="ProductCard-look">
 
-              <!-- Основное фото -->
               <div class="ProductCard-photo">
                 <img :src="product?.images ? product.images[activePhoto].src : null" :alt="product?.images ? product.images[activePhoto].alt : null"/>
               </div>
-              <!-- Основное фото -->
-              
-              <!-- Миниатюры -->
+
               <div class="ProductCard-picts">
                 <a v-for="(image, index) in product.images" class="ProductCard-pict" :class="{'ProductCard-pict_ACTIVE': activePhoto === index}" @click.prevent="setActivePhoto(index)">
                   <img :src="image.src" :alt="image.alt"/>
                 </a>
               </div>
-              <!-- Миниатюры -->
 
             </div>
             <div class="ProductCard-desc">
@@ -41,17 +37,13 @@
                 <h2 class="ProductCard-title">${ product.title }$</h2>
                 <div class="ProductCard-info">
                   <div class="ProductCard-cost">
-                    <div class="ProductCard-price">$${ product.price }$
+                    <div class="ProductCard-price">${ product.price }$ ₽
                     </div>
                   </div>
                 </div>
               </div>
               <div class="ProductCard-text">
-
-                <!-- Описание как html -->
                 <div v-html="product.description"></div>
-                <!-- Описание как html -->
-
               </div>
               <div class="ProductCard-cart">
                 <div class="ProductCard-cartElement ProductCard-cartElement_amount">
@@ -73,12 +65,8 @@
               <div class="ProductCard-footer">
                 <div class="ProductCard-tags">
                   <strong class="ProductCard-tagsTitle">Tags:</strong>
-
-                  <!-- Как добавить пробел между ссылками? -->
-                  <div v-for="(tag, index) in tags" >${ tag.name }$
-<!--                    <span v-if="(index !== tags.length -1) && (tags.length !== 1)">|</span>-->
+                  <div v-for="(tag, index) in tags">${ tag.name }$
                   </div>
-
                 </div>
               </div>
             </div>
@@ -96,32 +84,21 @@
               <div class="Tabs-block" id="description">
                 <div v-html="product.fullDescription"></div>
 
-                
-                <div class="clearfix">
+                <div class="clearfix"></div>
                 </div>
-                <div class="table">
-                  <table>
-                    <tr>
-                      <th>Характеристика
-                      </th>
-                      <th>Значение
-                      </th>
-                    </tr>
-                    <tr v-for="spec in product.specifications">
-                      <td>${ spec.name }$</td>
-                      <td>${ spec.value }$</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-              <div class="Tabs-block" id="reviews">
+<div class="Tabs-block" id="reviews">
                 <header class="Section-header">
                   <h3 class="Section-title">${ product.reviews ? (product.reviews.length || 0) : 0 }$ Отзывов</h3>
                 </header>
                 <div class="Comments">
                   <div v-for="review in product.reviews" class="Comment">
                     <div class="Comment-column Comment-column_pict">
-                      <div class="Comment-avatar"></div>
+                      <div class="Comment-avatar"
+                                         :style="{
+                                           backgroundImage: 'url(' + review.avatar + ')',
+                                           backgroundSize: 'cover',
+                                           backgroundPosition: 'center',
+                                         }"></div>
                     </div>
                     <div class="Comment-column">
                       <header class="Comment-header">
@@ -135,40 +112,47 @@
                     </div>
                   </div>
                 </div>
+
                 <header class="Section-header Section-header_product">
-                  <h3 class="Section-title">Add Review</h3>
+                  <h3 class="Section-title">Добавить отзыв</h3>
                 </header>
-                <div class="Tabs-addComment">
-                  <form class="form" @submit.prevent="submitReview">
-                    <div class="form-group">
-                      <textarea class="form-textarea" name="review" id="review" placeholder="Review" v-model="review.text"></textarea>
-                    </div>
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="row-block">
-                          <input class="form-input" id="name" name="name" type="text" placeholder="Name" v-model="review.author"/>
-                        </div>
-                        <div class="row-block">
-                          <input class="form-input" id="email" name="email" type="text" placeholder="Email" v-model="review.email"/>
-                        </div>
-                        <div class="row-block">
-                          <select name="rate" id="rate" v-model="review.rate">
-                            <optgroup label="rate">
-                              <option value="1">1</option>
-                              <option value="2">2</option>
-                              <option value="3">3</option>
-                              <option value="4">4</option>
-                              <option value="5">5</option>
-                            </optgroup>
-                          </select>
+
+                {% if user.is_authenticated %}
+                  <div class="Tabs-addComment">
+                    <form class="form" @submit.prevent="submitReview">
+                      <div class="form-group">
+                        <textarea class="form-textarea" name="review" id="review"
+                                  placeholder="Ваш отзыв" v-model="review.text"></textarea>
+                        <div v-if="review.errors && review.errors.text" class="form-error">
+                          ${ review.errors.text }$
                         </div>
                       </div>
-                    </div>
-                    <div class="form-group">
-                      <button class="btn btn_muted" type="submit">Submit Review</button>
-                    </div>
-                  </form>
-                </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="row-block">
+                            <select class="form-input" name="rate" id="rate" v-model.number="review.rate">
+                              <option :value="1">1</option>
+                              <option :value="2">2</option>
+                              <option :value="3">3</option>
+                              <option :value="4">4</option>
+                              <option :value="5">5</option>
+                            </select>
+                            <div v-if="review.errors && review.errors.rate" class="form-error">
+                              ${ review.errors.rate }$
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <button class="btn btn_muted" type="submit">Отправить отзыв</button>
+                      </div>
+                    </form>
+                  </div>
+                {% else %}
+                  <div class="Tabs-addComment">
+                    <p>Чтобы оставить отзыв, <a href="/sign-in/">авторизуйтесь</a>.</p>
+                  </div>
+                {% endif %}
               </div>
             </div>
           </div>

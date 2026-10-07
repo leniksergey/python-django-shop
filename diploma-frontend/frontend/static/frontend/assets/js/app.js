@@ -31,13 +31,12 @@ createApp({
 						data: response?.data,
 						status: response.status,
 					}
-					return response.data ? response.data : response.json?.()
 				})
 				.catch((error) => {
 					console.warn(
-						`Метод '${url}' вернул статус код ${error.response.status}`
+						`Метод '${url}' вернул статус код ${error?.response?.status}`
 					)
-					throw new Error()
+					return Promise.reject(error)
 				})
 		},
 		getData(url, payload) {
@@ -46,9 +45,9 @@ createApp({
 				.then((response) => {
 					return response.data ? response.data : response.json?.()
 				})
-				.catch(() => {
+				.catch((error) => {
 					console.warn('Метод ' + url + ' не реализован')
-					throw new Error('no "get" method')
+					return Promise.reject(error)
 				})
 		},
 		search() {
@@ -78,21 +77,6 @@ createApp({
 					this.basket = {}
 				})
 		},
-		// getLastOrder() {
-		// 	this.getData('/api/orders/active/')
-		// 		.then(data => {
-		// 			this.order = {
-		// 				...this.order,
-		// 				...data
-		// 			}
-		// 		})
-		// 		.catch(() => {
-		// 			console.warn('Ошибка при получении активного заказа')
-		// 			this.order = {
-		// 				...this.order,
-		// 			}
-		// 		})
-		// },
 		addToBasket(item, count = 1) {
 			const { id } = item
 			this.postData('/api/basket', { id, count })
@@ -142,7 +126,6 @@ createApp({
 	},
 	data() {
 		return {
-			// catalog page
 			filters: {
 				price: {
 					minValue: 1,
@@ -158,34 +141,17 @@ createApp({
 				{ id: 'date', title: 'Новизне' },
 			],
 			topTags: [],
-			// reused data
 			categories: [],
-			// reused data
 			catalogFromServer: [],
 			orders: [],
 			cart: [],
 			paymentData: {},
 			basket: {},
-			// order: {
-			// 	orderId: null,
-			// 	createdAt: '',
-			// 	products: [],
-			// 	fullName: '',
-			// 	phone: '',
-			// 	email: '',
-			// 	deliveryType: '',
-			// 	city: '',
-			// 	address: '',
-			// 	paymentType: '',
-			// 	totalCost: 0,
-			// 	status: ''
-			// },
 			searchText: '',
 		}
 	},
 	mounted() {
 		this.getCategories()
 		this.getBasket()
-		// this.getLastOrder()
 	},
 }).mount('#site')

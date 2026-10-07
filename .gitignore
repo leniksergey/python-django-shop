@@ -7,3 +7,6 @@ __pycache__/
 *.pyc
 db.sqlite3
 media/*
+*.egg-info/
+diploma-frontend/dist/diploma_frontend-0.6/
+diploma-frontend/dist/diploma-frontend-0.6/

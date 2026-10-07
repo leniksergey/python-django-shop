@@ -1,11 +1,11 @@
 import json
 
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Avg, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
-from .models import Category, Product
+from .models import Category, Product, Review
 
 PLACEHOLDER = "/static/frontend/assets/img/content/home/card.jpg"
 CATEGORY_PLACEHOLDER = "/static/frontend/assets/img/icons/allDep.svg"
@@ -15,27 +15,35 @@ SORT_FIELDS = {"price": "price", "date": "created_at"}
 def catalog(request):
     params = request.GET
     products = Product.objects.all()
+
     category_id = params.get("category")
     if category_id:
         products = products.filter(
             Q(category_id=category_id) | Q(category__parent_id=category_id)
         )
+
     name = params.get("filter[name]")
     if name:
         products = products.filter(title__icontains=name)
+
     products = products.filter(
         price__gte=params.get("filter[minPrice]", 0),
         price__lte=params.get("filter[maxPrice]", 1000000),
     )
+
     if params.get("filter[freeDelivery]") == "true":
         products = products.filter(free_delivery=True)
+
     if params.get("filter[available]") == "true":
         products = products.filter(count__gt=0)
+
     field = SORT_FIELDS.get(params.get("sort"), "created_at")
     if params.get("sortType") == "dec":
         field = "-" + field
+
     paginator = Paginator(products.order_by(field), int(params.get("limit", 20)))
     page = paginator.get_page(params.get("currentPage", 1))
+
     return JsonResponse({
         "items": [product_short(product) for product in page],
         "currentPage": page.number,
@@ -73,6 +81,36 @@ def categories(request):
     return JsonResponse(data, safe=False)
 
 
+def product_images(product: Product):
+    images = [
+        {"src": image.image.url, "alt": product.title}
+        for image in product.images.all()
+    ]
+    return images or [{"src": PLACEHOLDER, "alt": product.title}]
+
+
+def avg_rating(product: Product):
+    """Средняя оценка по неархивированным отзывам товара."""
+    result = product.reviews.filter(archived=False).aggregate(avg=Avg("rate"))
+    return round(result["avg"] or 0, 1)
+
+
+def serialize_review(review: Review):
+    profile = getattr(review.user, "profile", None)
+    avatar_url = "/static/frontend/assets/img/icons/user_icon.svg"
+    if profile and profile.avatar:
+        avatar_url = profile.avatar.url
+
+    return {
+        "id": review.pk,
+        "author": review.user.get_full_name() or review.user.username,
+        "date": review.created_at.strftime("%Y-%m-%d"),
+        "rate": review.rate,
+        "text": review.text,
+        "avatar": avatar_url,
+    }
+
+
 def product_short(product: Product):
     return {
         "id": product.pk,
@@ -85,30 +123,64 @@ def product_short(product: Product):
         "freeDelivery": product.free_delivery,
         "images": product_images(product),
         "tags": [],
-        "reviews": 0,
-        "rating": 0,
+        "reviews": product.reviews.filter(archived=False).count(),
+        "rating": avg_rating(product),
     }
 
 
-# noinspection PyUnusedLocal
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        # Добавление отзыва — только для авторизованных
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Unauthorized"}, status=401)
+
+        try:
+            body = json.loads(request.body or "{}")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "invalid json"}, status=400)
+
+        text = (body.get("text") or "").strip()
+        try:
+            rate = int(body.get("rate") or 5)
+        except (TypeError, ValueError):
+            rate = 5
+
+        errors = {}
+        if not text:
+            errors["text"] = ["Текст отзыва обязателен"]
+        if not (1 <= rate <= 5):
+            errors["rate"] = ["Оценка должна быть от 1 до 5"]
+
+        if errors:
+            return JsonResponse(
+                {"error": "validation failed", "errors": errors}, status=400
+            )
+
+        review = Review.objects.create(
+            product=product,
+            user=request.user,
+            text=text,
+            rate=rate,
+        )
+        return JsonResponse(serialize_review(review), status=201)
+
+    # GET — карточка товара с отзывами
     data = product_short(product)
+    reviews = (
+        product.reviews
+        .filter(archived=False)
+        .select_related("user")
+        .order_by("-created_at")[:10]
+    )
     data.update({
         "fullDescription": product.description,
         "tags": [],
-        "reviews": [],
+        "reviews": [serialize_review(r) for r in reviews],
         "specifications": [],
     })
     return JsonResponse(data)
-
-
-def product_images(product: Product):
-    images = [
-        {"src": image.image.url, "alt": product.title}
-        for image in product.images.all()
-    ]
-    return images or [{"src": PLACEHOLDER, "alt": product.title}]
 
 
 def basket_data(request):

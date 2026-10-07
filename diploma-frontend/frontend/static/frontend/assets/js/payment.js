@@ -1,42 +1,59 @@
 var mix = {
 	methods: {
+		validatePayment() {
+			const errs = {}
+
+			const number = (this.number1 || '').trim()
+			if (!number) {
+				errs.number1 = 'Укажите номер'
+			} else if (!/^\d+$/.test(number)) {
+				errs.number1 = 'Только цифры'
+			} else if (number.length > 8) {
+				errs.number1 = 'Не более 8 цифр'
+			} else if (parseInt(number, 10) % 2 !== 0) {
+				errs.number1 = 'Номер должен быть чётным'
+			}
+
+			this.errors = errs
+			return Object.keys(errs).length === 0
+		},
+
 		submitPayment() {
+			if (!this.validatePayment()) {
+				return
+			}
 			const orderId = location.pathname.startsWith('/payment/')
 				? Number(location.pathname.replace('/payment/', '').replace('/', ''))
 				: null
-			console.log({
-				name: this.name,
-				number: this.number1,
-				year: this.year,
-				month: this.month,
-				code: this.code,
-			})
+
 			this.postData(`/api/payment/${orderId}`, {
-				name: this.name,
 				number: this.number1,
-				year: this.year,
-				month: this.month,
-				code: this.code
-			}).then(() => {
-				alert('Успешная оплата')
-				this.number1 = ''
-				this.name = ''
-				this.year = ''
-				this.month = ''
-				this.code = ''
-				location.assign('/')
-			}).catch(() => {
-			 	console.warn('Ошибка при оплате')
 			})
-		}
+				.then(() => {
+					alert('Успешная оплата')
+					this.number1 = ''
+					this.errors = {}
+					location.assign('/')
+				})
+				.catch((err) => {
+					const errors = err?.response?.data?.errors
+					if (errors) {
+						this.errors = errors
+					} else {
+						alert('Ошибка при оплате')
+					}
+				})
+		},
 	},
+
+	watch: {
+		number1() { this.validatePayment() },
+	},
+
 	data() {
 		return {
 			number1: '',
-			month: '',
-			year: '',
-			name: '',
-			code: ''
+			errors: {},
 		}
-	}
+	},
 }
