@@ -116,6 +116,7 @@ def product_short(product: Product):
         "id": product.pk,
         "category": product.category_id,
         "price": float(product.price),
+        "salePrice": float(product.sale_price) if product.sale_price else None,  # ← добавить
         "count": product.count,
         "date": product.created_at.isoformat(),
         "title": product.title,
@@ -181,6 +182,30 @@ def product_detail(request, product_id):
         "specifications": [],
     })
     return JsonResponse(data)
+
+
+def product_sale(product: Product):
+    return {
+        "id": product.pk,
+        "title": product.title,
+        "price": float(product.price),
+        "salePrice": float(product.sale_price),
+        "images": product_images(product),
+    }
+
+
+def sales(request):
+    """API раздела Sales: товары со скидкой с пагинацией."""
+    products = Product.objects.filter(sale_price__isnull=False)
+
+    paginator = Paginator(products.order_by("-created_at"), 12)
+    page = paginator.get_page(request.GET.get("currentPage", 1))
+
+    return JsonResponse({
+        "items": [product_sale(product) for product in page],
+        "currentPage": page.number,
+        "lastPage": paginator.num_pages,
+    })
 
 
 def basket_data(request):

@@ -145,7 +145,12 @@ def create_order(request):
             phone=phone,
         )
         OrderItem.objects.bulk_create(
-            OrderItem(order=order, product=product, price=product.price, count=count)
+            OrderItem(
+                order=order,
+                product=product,
+                price=product.sale_price or product.price,  # ← правильно!
+                count=count,
+            )
             for product, count in form.cleaned_data["items"]
         )
     return JsonResponse({"orderId": order.pk})
