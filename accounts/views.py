@@ -1,48 +1,132 @@
 import json
+
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.http import JsonResponse
-from .models import Profile
 
+from .models import Profile
 
 
 def sign_in(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
-    body = json.loads(request.body)
-    user = authenticate(
-        request, username=body.get("username"), password=body.get("password")
-    )
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "invalid json"}, status=400)
+
+    username = body.get("username")
+    password = body.get("password")
+
+    if not username or not password:
+        return JsonResponse(
+            {"error": "Укажите логин и пароль"},
+            status=400,
+        )
+
+    user = authenticate(request, username=username, password=password)
     if user is None:
-        return JsonResponse({"error": "invalid credentials"}, status=500)
+        return JsonResponse(
+            {"error": "Неверный логин или пароль"},
+            status=401,
+        )
+
+    # Проверка архивации профиля
+    profile = getattr(user, "profile", None)
+    if profile and profile.archived:
+        return JsonResponse(
+            {"error": "Аккаунт архивирован"},
+            status=403,
+        )
+
+    # Проверка is_active
+    if not user.is_active:
+        return JsonResponse(
+            {"error": "Аккаунт отключён"},
+            status=403,
+        )
+
     login(request, user)
+
+    # Привязка анонимных заказов по email
+    from orders.models import Order
+    Order.objects.filter(user=None, email=user.email).update(user=user)
+
     return JsonResponse({})
+
+
 
 
 def sign_up(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
-    body = json.loads(request.body)
-    username, password = body.get("username"), body.get("password")
-    if not username or not password or User.objects.filter(username=username).exists():
-        return JsonResponse({"error": "invalid data"}, status=500)
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "invalid json"}, status=400)
+
+    email = body.get("email", "")
+    username = body.get("username")
+
+    # Если username не передан — берём часть email до @
+    if not username and email:
+        base = email.split("@")[0]
+        username = base
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base}{counter}"
+            counter += 1
+    password = body.get("password")
+    name = body.get("name", "") or body.get("fullName", "")
+    phone = body.get("phone", "")
+
+    if not username or not password:
+        return JsonResponse({"error": "Укажите email и пароль"}, status=400)
+
+    if User.objects.filter(username=username).exists():
+        return JsonResponse(
+            {"error": "Пользователь с указанным email существует, вы можете авторизоваться"},
+            status=409,
+        )
+
+    if email and User.objects.filter(email=email).exists():
+        return JsonResponse(
+            {"error": "Пользователь с указанным email существует, вы можете авторизоваться"},
+            status=409,
+        )
+
+    parts = name.split(" ", 1)
+    first_name = parts[0] if parts else ""
+    last_name = parts[1] if len(parts) > 1 else ""
 
     user = User.objects.create_user(
-        username=username, password=password, first_name=body.get("name", "")
+        username=username,
+        password=password,
+        email=email or "",
+        first_name=first_name,
+        last_name=last_name,
     )
-    Profile.objects.create(user=user)
+    profile, _ = Profile.objects.get_or_create(user=user)
+    if phone:
+        profile.phone = phone
+        profile.save()
+
     login(request, user)
+
+    # Привязка анонимных заказов по email
+    from orders.models import Order
+    Order.objects.filter(user=None, email=user.email).update(user=user)
+
     return JsonResponse({})
 
 
 def sign_out(request):
     logout(request)
     return JsonResponse({})
-
 
 
 def _validate_profile_data(body, user):
@@ -206,7 +290,10 @@ def change_password_view(request):
 
 
 def _serialize_profile(user, profile):
-    avatar_src = profile.avatar.url if profile.avatar else "/media/avatars/default.png"
+    if profile.avatar:
+        avatar_src = profile.avatar.url
+    else:
+        avatar_src = "/static/frontend/assets/img/icons/user_icon.svg"
     return {
         "fullName": user.get_full_name() or user.username,
         "email": user.email,

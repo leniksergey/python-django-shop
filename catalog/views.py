@@ -95,12 +95,11 @@ def avg_rating(product: Product):
     return round(result["avg"] or 0, 1)
 
 
-def serialize_review(review: Review):
+def serialize_review(review):
     profile = getattr(review.user, "profile", None)
     avatar_url = "/static/frontend/assets/img/icons/user_icon.svg"
     if profile and profile.avatar:
         avatar_url = profile.avatar.url
-
     return {
         "id": review.pk,
         "author": review.user.get_full_name() or review.user.username,
@@ -173,12 +172,14 @@ def product_detail(request, product_id):
         product.reviews
         .filter(archived=False)
         .select_related("user")
-        .order_by("-created_at")[:10]
+        .order_by("created_at")[:3]
     )
     data.update({
         "fullDescription": product.description,
         "tags": [],
         "reviews": [serialize_review(r) for r in reviews],
+        "reviewsLastPage": max(1, (product.reviews.filter(archived=False).count() + 2) // 3),
+        "totalReviews": product.reviews.filter(archived=False).count(),
         "specifications": [],
     })
     return JsonResponse(data)
@@ -194,17 +195,23 @@ def product_sale(product: Product):
     }
 
 
-def sales(request):
-    """API раздела Sales: товары со скидкой с пагинацией."""
-    products = Product.objects.filter(sale_price__isnull=False)
-
-    paginator = Paginator(products.order_by("-created_at"), 12)
-    page = paginator.get_page(request.GET.get("currentPage", 1))
-
+def product_reviews(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    reviews = (
+        product.reviews
+        .filter(archived=False)
+        .select_related("user")
+        .order_by("created_at")
+    )
+    page_num = int(request.GET.get("page", 1))
+    if page_num <= 1:
+        items = [serialize_review(r) for r in reviews[:3]]
+    else:
+        items = [serialize_review(r) for r in reviews]
     return JsonResponse({
-        "items": [product_sale(product) for product in page],
-        "currentPage": page.number,
-        "lastPage": paginator.num_pages,
+        "items": items,
+        "currentPage": page_num,
+        "lastPage": 1,
     })
 
 
@@ -252,3 +259,15 @@ def limited(request):
 def banners(request):
     products = Product.objects.order_by("-created_at")[:3]
     return JsonResponse([product_short(product) for product in products], safe=False)
+
+
+def sales(request):
+    """API раздела Sales: товары со скидкой с пагинацией."""
+    products = Product.objects.filter(sale_price__isnull=False)
+    paginator = Paginator(products.order_by("-created_at"), 12)
+    page = paginator.get_page(request.GET.get("currentPage", 1))
+    return JsonResponse({
+        "items": [product_sale(product) for product in page],
+        "currentPage": page.number,
+        "lastPage": paginator.num_pages,
+    })

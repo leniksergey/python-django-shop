@@ -123,6 +123,13 @@ def create_order(request):
     if err:
         return err
 
+    # Защита от дублей: если заказ уже создан в сессии — вернуть его
+    existing_id = request.session.get("pending_order_id")
+    if existing_id:
+        existing = Order.objects.filter(id=existing_id, user=None).first()
+        if existing and existing.items.exists():
+            return JsonResponse({"orderId": existing.pk})
+
     form = OrderCreateForm({"items": body})
     if not form.is_valid():
         return JsonResponse(
@@ -148,11 +155,14 @@ def create_order(request):
             OrderItem(
                 order=order,
                 product=product,
-                price=product.sale_price or product.price,  # ← правильно!
+                price=product.sale_price or product.price,
                 count=count,
             )
             for product, count in form.cleaned_data["items"]
         )
+
+    request.session["pending_order_id"] = order.pk
+
     return JsonResponse({"orderId": order.pk})
 
 
@@ -211,8 +221,8 @@ def payment(request, order_id):
         order.payment_error = error_text or "Ошибка оплаты"
         order.save(update_fields=["status", "payment_error"])
         return JsonResponse(
-            {"error": "payment failed", "paymentError": order.payment_error},
-            status=500,
+            {"success": False, "paymentError": order.payment_error},
+            status=200,  # ← 200: бизнес-ошибка, не серверная
         )
 
     order.status = Order.Status.PAID

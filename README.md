@@ -1,67 +1,134 @@
-# Интернет-магазин
+# Интернет-магазин Megano
+
+Django-проект интернет-магазина с Vue-фронтендом, корзиной, оформлением заказа, оплатой через Celery.
+
+## Требования
+
+- Python 3.11+
+- Docker (для Redis)
+- Git
 
 ## Установка
 
 ```bash
+git clone <repo-url>
+cd python_django_diploma
+
+# Виртуальное окружение
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate     # Linux/Mac
+# venv\Scripts\activate      # Windows
+
+# Зависимости
 pip install -r requirements.txt
+
+# Фронтенд (editable-режим)
+cd diploma-frontend
+pip install -e .
+cd ..
 ```
 
-## Подключение фронтенда
+## Настройка окружения
+
+Скопируйте `.env.example` в `.env`:
 
 ```bash
-cd diploma-frontend
-python setup.py sdist
-cd ..
-pip install diploma-frontend/dist/*.tar.gz
+cp .env.example .env
 ```
 
-## Запуск
+Переменные:
+- `SECRET_KEY` — секретный ключ Django;
+- `DEBUG` — режим отладки (`True` / `False`);
+- `ALLOWED_HOSTS` — разрешённые хосты через запятую;
+- `REDIS_URL` — адрес Redis для Celery.
+
+## Redis
+
+```bash
+docker run -d --name shop-redis -p 6379:6379 redis:7
+```
+
+Если контейнер уже создан:
+
+```bash
+docker start shop-redis
+```
+
+## База данных и демо-данные
 
 ```bash
 python manage.py migrate
-python manage.py loaddata catalog/fixtures/catalog.json
-python manage.py createsuperuser
-python manage.py runserver
+python manage.py loaddata fixtures/demo.json
 ```
 
-Сайт: http://127.0.0.1:8000, админка: http://127.0.0.1:8000/admin/
+Фикстура `fixtures/demo.json` добавляет:
+- категории, товары, картинки;
+- администратора и покупателей;
+- отзывы, заказы, настройки доставки.
 
+## Запуск
+
+**Терминал 1 — Celery:**
+
+```bash
+celery -A shop worker -l info
+```
+
+**Терминал 2 — Django:**
+
+```bash
+python manage.py runserver 8000
+```
+
+- Сайт: http://127.0.0.1:8000
+- Админка: http://127.0.0.1:8000/admin/
+
+## Тестовые учётные данные
+
+| Роль | Логин | Пароль |
+|------|-------|--------|
+| Администратор | `admin` | `admin123` |
+| Покупатель | `buyer1` | `123456` |
+| Покупатель | `buyer2` | `123456` |
+| Покупатель | `buyer3` | `123456` |
+| Покупатель | `vasya` | `123456` |
 
 ## Валидация
 
 Все правила — в [docs/VALIDATION.md](docs/VALIDATION.md).
 
 Три уровня:
-- **Frontend (Vue)** — ошибки при вводе, под полями
-- **Backend (Django Forms)** — `OrderCreateForm`, `OrderUpdateForm`, `PaymentForm`
-- **Модель (validators)** — регулярки для телефона, минимальные значения
-
-Тестовые карты (Luhn-валидные):
-- `4242424242424242`
-- `4111111111111111`
-- `5555555555554444`
-
-Срок действия: `12/2027`, CVV: `123`.
+- **Frontend (Vue)** — ошибки при вводе, под полями;
+- **Backend (Django Forms)** — `OrderCreateForm`, `OrderUpdateForm`, `PaymentForm`;
+- **Модель (validators)** — регулярки для телефона, минимальные значения.
 
 ## Очередь оплаты
 
-Оплата обрабатывается в фоне через Celery + Redis. Redis запускается в Docker:
+Оплата обрабатывается в фоне через Celery + Redis.
 
-```bash
-docker run -d --name shop-redis -p 6379:6379 redis:7
-```
-
-Если контейнер уже создан, достаточно `docker start shop-redis`.
-
-Воркер Celery запускается в отдельном терминале (при активированном venv):
-
-```bash
-celery -A shop worker -l info
-```
+**Логика фиктивного сервиса:**
+- чётный и не заканчивается на 0 → оплата **подтверждается** (`PAID`);
+- нечётный или заканчивается на 0 → **ошибка** (`FAILED`).
 
 Без запущенного воркера оплата вернёт ошибку.
+
+## Структура проекта
+
+```
+python_django_diploma/
+├── accounts/          # пользователи, профили
+├── catalog/           # категории, товары, отзывы
+├── orders/            # заказы, доставка, оплата (Celery)
+├── shop/              # настройки Django, celery.py
+├── diploma-frontend/  # Vue-фронтенд (editable)
+├── fixtures/          # демо-данные
+├── docs/              # VALIDATION.md
+├── media/             # загруженные файлы
+├── manage.py
+├── requirements.txt
+├── .env.example
+└── README.md
+```
 
 ## Ветки
 
