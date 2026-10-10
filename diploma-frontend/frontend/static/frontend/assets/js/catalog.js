@@ -85,6 +85,13 @@ var mix = {
             this.category = category.length ? Number(category) : null
         }
 
+        // ← Читаем filter из URL
+        const params = new URLSearchParams(location.search)
+        const filterParam = params.get('filter')
+        if (filterParam) {
+            this.filter.name = filterParam
+        }
+
         this.getCatalogs()
         this.getTags()
     },

@@ -1,16 +1,24 @@
 var mix = {
     methods: {
-        submitBasket () {
+        submitBasket() {
+            // Защита от двойного клика
+            if (this.creatingOrder) return
+            this.creatingOrder = true
+
             this.postData('/api/orders', Object.values(this.basket))
-                .then(({data: { orderId }}) => {
+                .then(({data: {orderId}}) => {
                     location.assign(`/order-detail/${orderId}/`)
-                }).catch(() => {
+                })
+                .catch(() => {
                     console.warn('Ошибка при создании заказа')
+                    this.creatingOrder = false
                 })
         }
     },
     mounted() {},
     data() {
-        return {}
+        return {
+            creatingOrder: false,
+        }
     }
 }

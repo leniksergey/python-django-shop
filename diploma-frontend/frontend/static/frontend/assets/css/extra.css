@@ -6260,3 +6260,195 @@ a.Cart-title {
     object-fit: contain;
     margin: 0 auto;
 }
+
+/* Toast уведомление */
+.Toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    z-index: 9999;
+    min-width: 320px;
+    max-width: 400px;
+    animation: toastSlideIn 0.3s ease;
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.Toast-content {
+    margin-bottom: 15px;
+}
+
+.Toast-text {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.Toast-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.Toast-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background 0.2s;
+}
+
+.Toast-btn_primary {
+    background: #0063d1;
+    color: #fff;
+}
+
+.Toast-btn_primary:hover {
+    background: #0052b0;
+}
+
+.Toast-btn_secondary {
+    background: #f0f2f5;
+    color: #333;
+}
+
+.Toast-btn_secondary:hover {
+    background: #e0e2e5;
+}
+
+.Toast_success .Toast-text {
+    color: #0a7c2f;
+}
+
+.Toast_error .Toast-text {
+    color: #d32f2f;
+}
+
+/* Ошибки форм */
+.form-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.form-input_error {
+    border-color: #d32f2f !important;
+}
+
+/* Модальное окно */
+.Modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.Modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.Modal-title {
+    margin: 0 0 20px;
+    font-size: 20px;
+}
+
+.Modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Фикс: label аватара встаёт по центру блока */
+.Profile-avatar {
+    position: relative;
+}
+
+/* Секция аватара без картинки */
+.Profile-avatar_noimg {
+    border: 1px solid #e0e0e0;
+    position: relative;
+    cursor: pointer;
+}
+
+.Profile-avatar_noimg .Profile-fileLabel {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.Profile-avatar_noimg .Profile-file {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Фикс: убрать белый фон у аватара */
+.Profile-img {
+    background: transparent !important;
+}
+
+/* Фикс: высота блока аватара без картинки */
+.Profile-avatar_noimg {
+    position: relative;
+    height: 293px;
+    min-height: 293px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+/* Стили ошибок форм */
+.form-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
+.form-input_error {
+    border-color: #d32f2f !important;
+}
+
+/* Стили ошибок форм */
+.form-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
+.form-input_error {
+    border-color: #d32f2f !important;
+}

@@ -9,7 +9,6 @@ createApp({
                 const cookies = document.cookie.split(';')
                 for (let i = 0; i < cookies.length; i++) {
                     const cookie = cookies[i].trim()
-                    // Does this cookie string begin with the name we want?
                     if (cookie.substring(0, name.length + 1) === name + '=') {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
                         break
@@ -77,14 +76,36 @@ createApp({
                     this.basket = {}
                 })
         },
+        // ---- Toast ----
+        showToast(text, options = {}) {
+            this.toast = {
+                text: text,
+                type: options.type || 'success',
+                showCart: options.showCart !== false,
+            }
+            if (this.toastTimer) clearTimeout(this.toastTimer)
+            this.toastTimer = setTimeout(() => {
+                this.toast = null
+            }, 9000)
+        },
+        hideToast() {
+            this.toast = null
+            if (this.toastTimer) clearTimeout(this.toastTimer)
+        },
+        // ---- Корзина ----
         addToBasket(item, count = 1) {
             const {id} = item
             this.postData('/api/basket', {id, count})
                 .then(({data}) => {
                     this.basket = data
+                    this.showToast(`Товар "${item.title}" добавлен в корзину`)
                 })
                 .catch(() => {
                     console.warn('Ошибка при добавлении заказа в корзину')
+                    this.showToast('Не удалось добавить товар', {
+                        type: 'error',
+                        showCart: false,
+                    })
                 })
         },
         removeFromBasket(id, count) {
@@ -148,6 +169,8 @@ createApp({
             paymentData: {},
             basket: {},
             searchText: '',
+            toast: null,
+            toastTimer: null,
         }
     },
     mounted() {

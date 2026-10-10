@@ -90,6 +90,19 @@ var mix = {
             } else if (!emailRe.test(this.email.trim())) {
                 this.errors.email = 'Введите корректный email'
             }
+            // Для неавторизованных — проверка пароля
+            if (!this.isAuthenticated) {
+                if (!this.password) {
+                    this.errors.password = 'Укажите пароль'
+                } else if (this.password.length < 6) {
+                    this.errors.password = 'Пароль должен быть не короче 6 символов'
+                }
+                if (!this.password2) {
+                    this.errors.password2 = 'Повторите пароль'
+                } else if (this.password !== this.password2) {
+                    this.errors.password2 = 'Пароли не совпадают'
+                }
+            }
             return Object.keys(this.errors).length === 0
         },
 
@@ -125,10 +138,71 @@ var mix = {
             return Object.keys(this.errors).length === 0
         },
 
+        tryRegister() {
+            this.errors = {}
+            return this.postData('/api/sign-up', {
+                name: this.fullName,
+                email: this.email,
+                phone: this.phone,
+                password: this.password,
+            })
+                .then(() => {
+                    this.isAuthenticated = true
+                    document.body.dataset.authenticated = 'true'
+                    this.password = ''
+                    this.password2 = ''
+                    return true
+                })
+                .catch((error) => {
+                    if (error?.response?.status === 409) {
+                        this.errors.email = 'Пользователь с указанным email существует, вы можете авторизоваться'
+                        this.loginUsername = this.email
+                        this.showLoginModal = true
+                    } else {
+                        const msg = error?.response?.data?.error
+                        this.errors.email = msg || 'Ошибка регистрации'
+                    }
+                    return false
+                })
+        },
+
+        loginFromModal() {
+            this.loginError = ''
+            if (!this.loginUsername || !this.loginPassword) {
+                this.loginError = 'Заполните логин и пароль'
+                return
+            }
+            this.postData('/api/sign-in', {
+                username: this.loginUsername,
+                password: this.loginPassword,
+            })
+                .then(() => {
+                    location.reload()
+                })
+                .catch(() => {
+                    this.loginError = 'Неверный логин или пароль'
+                })
+        },
+
         nextStep(step) {
             if (step === 2 && !this.validateStep1()) return
             if (step === 3 && !this.validateStep2()) return
             if (step === 4 && !this.validateStep3()) return
+
+            // Для неавторизованных — сначала регистрация
+            if (!this.isAuthenticated && this.currentStep === 1) {
+                this.tryRegister().then(ok => {
+                    if (!ok) return
+                    this.saveOrder()
+                        .then(() => {
+                            this.errors = {}
+                            this.currentStep = step
+                            window.scrollTo({top: 0, behavior: 'smooth'})
+                        })
+                        .catch(() => {})
+                })
+                return
+            }
 
             this.saveOrder()
                 .then(() => {
@@ -136,8 +210,7 @@ var mix = {
                     this.currentStep = step
                     window.scrollTo({top: 0, behavior: 'smooth'})
                 })
-                .catch(() => {
-                })
+                .catch(() => {})
         },
 
         prevStep(step) {
@@ -165,18 +238,6 @@ var mix = {
                     alert('Ошибка при подтверждении заказа')
                 })
         },
-
-        auth() {
-            const username = document.querySelector('#username').value
-            const password = document.querySelector('#password').value
-            this.postData('/api/sign-in', JSON.stringify({username, password}))
-                .then(() => {
-                    location.assign(`/orders/${this.orderId}`)
-                })
-                .catch(() => {
-                    alert('Ошибка авторизации')
-                })
-        },
     },
 
     computed: {
@@ -194,6 +255,9 @@ var mix = {
     },
 
     mounted() {
+        // Проверяем авторизацию
+        this.isAuthenticated = document.body.dataset.authenticated === 'true'
+
         const match = location.pathname.match(/\/(orders|order-detail)\/(\d+)\//)
         if (match) {
             this.orderId = Number(match[2])
@@ -221,6 +285,17 @@ var mix = {
             itemsCost: 0,
             deliveryCost: 0,
             comment: '',
+
+            // Для регистрации в форме
+            isAuthenticated: false,
+            password: '',
+            password2: '',
+
+            // Модальное окно входа
+            showLoginModal: false,
+            loginUsername: '',
+            loginPassword: '',
+            loginError: '',
         }
     },
 
@@ -228,6 +303,8 @@ var mix = {
         fullName() { this.validateStep1() },
         phone() { this.validateStep1() },
         email() { this.validateStep1() },
+        password() { this.validateStep1() },
+        password2() { this.validateStep1() },
         city() { this.validateStep2() },
         address() { this.validateStep2() },
         deliveryType() { this.validateStep2() },

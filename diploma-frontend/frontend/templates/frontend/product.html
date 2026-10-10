@@ -6,11 +6,10 @@
     <div class="Middle-top">
       <div class="wrap">
         <div class="Middle-header">
-          <h1 class="Middle-title">Megano Product
-          </h1>
+          <h1 class="Middle-title">Megano Product</h1>
           <ul class="breadcrumbs Middle-breadcrumbs">
             <li class="breadcrumbs-item"><a href="/">home</a></li>
-            <li class="breadcrumbs-item breadcrumbs-item_current"><span>${product.title}$</span></li>
+            <li class="breadcrumbs-item breadcrumbs-item_current"><span>${ product.title }$</span></li>
           </ul>
         </div>
       </div>
@@ -20,25 +19,24 @@
         <div class="Product">
           <div class="ProductCard">
             <div class="ProductCard-look">
-
               <div class="ProductCard-photo">
-                <img :src="product?.images ? product.images[activePhoto].src : null" :alt="product?.images ? product.images[activePhoto].alt : null"/>
+                <img :src="product?.images ? product.images[activePhoto].src : null"
+                     :alt="product?.images ? product.images[activePhoto].alt : null"/>
               </div>
-
               <div class="ProductCard-picts">
-                <a v-for="(image, index) in product.images" class="ProductCard-pict" :class="{'ProductCard-pict_ACTIVE': activePhoto === index}" @click.prevent="setActivePhoto(index)">
+                <a v-for="(image, index) in product.images" class="ProductCard-pict"
+                   :class="{'ProductCard-pict_ACTIVE': activePhoto === index}"
+                   @click.prevent="setActivePhoto(index)">
                   <img :src="image.src" :alt="image.alt"/>
                 </a>
               </div>
-
             </div>
             <div class="ProductCard-desc">
               <div class="ProductCard-header">
                 <h2 class="ProductCard-title">${ product.title }$</h2>
                 <div class="ProductCard-info">
                   <div class="ProductCard-cost">
-                    <div class="ProductCard-price">${ product.price }$ ₽
-                    </div>
+                    <div class="ProductCard-price">${ product.price }$ ₽</div>
                   </div>
                 </div>
               </div>
@@ -48,17 +46,16 @@
               <div class="ProductCard-cart">
                 <div class="ProductCard-cartElement ProductCard-cartElement_amount">
                   <div class="Amount Amount_product">
-                    <button class="Amount-remove" type="button" @click.stop="changeCount(-1)">
-                    </button>
+                    <button class="Amount-remove" type="button" @click.stop="changeCount(-1)"></button>
                     <input class="Amount-input form-input" name="amount" type="text" v-model="count"/>
-                    <button class="Amount-add" type="button" @click.stop="changeCount(1)">
-                    </button>
+                    <button class="Amount-add" type="button" @click.stop="changeCount(1)"></button>
                   </div>
                 </div>
                 <div class="ProductCard-cartElement">
                   <button class="btn btn_primary" @click="addToBasket(product, count)">
-                    <img class="btn-icon" src="/static/frontend/assets/img/icons/card/cart_white.svg" alt="cart_white.svg"/>
-                    <span class="btn-content">Add To Cart</span>
+                    <img class="btn-icon" src="{% static 'frontend/assets/img/icons/card/cart_white.svg' %}"
+                         alt="cart_white.svg"/>
+                    <span class="btn-content">В корзину</span>
                   </button>
                 </div>
               </div>
@@ -66,32 +63,31 @@
           </div>
           <div class="Tabs Tabs_default">
             <div class="Tabs-links">
-              <a class="Tabs-link_ACTIVE Tabs-link" href="#description">
-                <span>Описание</span>
-              </a>
+              <a class="Tabs-link_ACTIVE Tabs-link" href="#description"><span>Описание</span></a>
               <a class="Tabs-link" href="#reviews">
-                <span>Отзывы (${ product.reviews ? product.reviews.length : 0 }$)</span>
+                <span>Отзывы (${ totalReviews }$)</span>
               </a>
             </div>
             <div class="Tabs-wrap">
               <div class="Tabs-block" id="description">
                 <div v-html="product.fullDescription"></div>
-
                 <div class="clearfix"></div>
-                </div>
-<div class="Tabs-block" id="reviews">
+              </div>
+
+              <div class="Tabs-block" id="reviews">
                 <header class="Section-header">
-                  <h3 class="Section-title">${ product.reviews ? (product.reviews.length || 0) : 0 }$ Отзывов</h3>
+                  <h3 class="Section-title">${ totalReviews }$ Отзывов</h3>
                 </header>
+
                 <div class="Comments">
                   <div v-for="review in product.reviews" class="Comment">
                     <div class="Comment-column Comment-column_pict">
                       <div class="Comment-avatar"
-                                         :style="{
-                                           backgroundImage: 'url(' + review.avatar + ')',
-                                           backgroundSize: 'cover',
-                                           backgroundPosition: 'center',
-                                         }"></div>
+                           :style="{
+                             backgroundImage: 'url(' + review.avatar + ')',
+                             backgroundSize: 'cover',
+                             backgroundPosition: 'center',
+                           }"></div>
                     </div>
                     <div class="Comment-column">
                       <header class="Comment-header">
@@ -104,6 +100,13 @@
                       <div class="Comment-content">${ review.text }$</div>
                     </div>
                   </div>
+                </div>
+
+                <!-- Кнопка "Показать ещё" -->
+                <div class="Comments-more" v-if="reviewsPage < reviewsLastPage">
+                  <button class="btn btn_muted" type="button" @click.prevent="loadMoreReviews">
+                    Показать ещё
+                  </button>
                 </div>
 
                 <header class="Section-header Section-header_product">
