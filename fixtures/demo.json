@@ -1,0 +1,982 @@
+[
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "Покупатель",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "Администратор",
+    "permissions": [
+      [
+        "add_profile",
+        "accounts",
+        "profile"
+      ],
+      [
+        "change_profile",
+        "accounts",
+        "profile"
+      ],
+      [
+        "delete_profile",
+        "accounts",
+        "profile"
+      ],
+      [
+        "view_profile",
+        "accounts",
+        "profile"
+      ],
+      [
+        "add_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "change_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "delete_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "view_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "add_group",
+        "auth",
+        "group"
+      ],
+      [
+        "change_group",
+        "auth",
+        "group"
+      ],
+      [
+        "delete_group",
+        "auth",
+        "group"
+      ],
+      [
+        "view_group",
+        "auth",
+        "group"
+      ],
+      [
+        "add_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "change_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "delete_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "view_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "add_user",
+        "auth",
+        "user"
+      ],
+      [
+        "change_user",
+        "auth",
+        "user"
+      ],
+      [
+        "delete_user",
+        "auth",
+        "user"
+      ],
+      [
+        "view_user",
+        "auth",
+        "user"
+      ],
+      [
+        "add_category",
+        "catalog",
+        "category"
+      ],
+      [
+        "change_category",
+        "catalog",
+        "category"
+      ],
+      [
+        "delete_category",
+        "catalog",
+        "category"
+      ],
+      [
+        "view_category",
+        "catalog",
+        "category"
+      ],
+      [
+        "add_product",
+        "catalog",
+        "product"
+      ],
+      [
+        "change_product",
+        "catalog",
+        "product"
+      ],
+      [
+        "delete_product",
+        "catalog",
+        "product"
+      ],
+      [
+        "view_product",
+        "catalog",
+        "product"
+      ],
+      [
+        "add_productimage",
+        "catalog",
+        "productimage"
+      ],
+      [
+        "change_productimage",
+        "catalog",
+        "productimage"
+      ],
+      [
+        "delete_productimage",
+        "catalog",
+        "productimage"
+      ],
+      [
+        "view_productimage",
+        "catalog",
+        "productimage"
+      ],
+      [
+        "add_review",
+        "catalog",
+        "review"
+      ],
+      [
+        "change_review",
+        "catalog",
+        "review"
+      ],
+      [
+        "delete_review",
+        "catalog",
+        "review"
+      ],
+      [
+        "view_review",
+        "catalog",
+        "review"
+      ],
+      [
+        "add_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "change_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "delete_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "view_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "add_deliverysettings",
+        "orders",
+        "deliverysettings"
+      ],
+      [
+        "change_deliverysettings",
+        "orders",
+        "deliverysettings"
+      ],
+      [
+        "delete_deliverysettings",
+        "orders",
+        "deliverysettings"
+      ],
+      [
+        "view_deliverysettings",
+        "orders",
+        "deliverysettings"
+      ],
+      [
+        "add_order",
+        "orders",
+        "order"
+      ],
+      [
+        "change_order",
+        "orders",
+        "order"
+      ],
+      [
+        "delete_order",
+        "orders",
+        "order"
+      ],
+      [
+        "view_order",
+        "orders",
+        "order"
+      ],
+      [
+        "add_orderitem",
+        "orders",
+        "orderitem"
+      ],
+      [
+        "change_orderitem",
+        "orders",
+        "orderitem"
+      ],
+      [
+        "delete_orderitem",
+        "orders",
+        "orderitem"
+      ],
+      [
+        "view_orderitem",
+        "orders",
+        "orderitem"
+      ],
+      [
+        "add_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "change_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "delete_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "view_session",
+        "sessions",
+        "session"
+      ]
+    ]
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 9,
+  "fields": {
+    "title": "Видеокарты",
+    "parent": null,
+    "image": "categories/images_13.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 10,
+  "fields": {
+    "title": "Процессоры",
+    "parent": null,
+    "image": "categories/images.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 11,
+  "fields": {
+    "title": "Наушники",
+    "parent": null,
+    "image": "categories/images_9_HI4sF0G.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 12,
+  "fields": {
+    "title": "Планшеты",
+    "parent": null,
+    "image": "categories/images_2.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 13,
+  "fields": {
+    "title": "Игровые",
+    "parent": 9,
+    "image": "categories/images_14.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "category": 13,
+    "title": "RTX 4070 TI",
+    "description": "The NVIDIA GeForce RTX 4070 Ti is a high-performance graphics card powered by the ultra-efficient Ada Lovelace architecture.\r\nGraphics card, 12 GB",
+    "count": 10,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 5,
+    "sold": 20,
+    "created_at": "2026-09-30T06:49:58.907Z",
+    "archived": false,
+    "price": "75000.00",
+    "sale_price": "69000.00"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 2,
+  "fields": {
+    "category": 9,
+    "title": "RTX 4060",
+    "description": "Graphics card, 8 GB",
+    "count": 15,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 8,
+    "sold": 5,
+    "created_at": "2026-09-30T06:52:30.024Z",
+    "archived": false,
+    "price": "35000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 3,
+  "fields": {
+    "category": 9,
+    "title": "RX 7800 XT",
+    "description": "Graphics card, 16 GB",
+    "count": 7,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 8,
+    "sold": 30,
+    "created_at": "2026-09-30T06:52:58.550Z",
+    "archived": false,
+    "price": "55000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 4,
+  "fields": {
+    "category": 10,
+    "title": "intel core i5-12400f",
+    "description": "The Intel Core i5-12400F is a popular and affordable 6-core 12th-generation processor from Intel (Alder Lake architecture) without integrated graphics, released in early 2022. \r\n6 cores, 2.5 - 4.4 GHz",
+    "count": 25,
+    "free_delivery": true,
+    "limited": false,
+    "sort_index": 3,
+    "sold": 40,
+    "created_at": "2026-09-30T06:56:04.123Z",
+    "archived": false,
+    "price": "12000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 5,
+  "fields": {
+    "category": 10,
+    "title": "Ryzen 7",
+    "description": "8 cores, 3.8 GHz",
+    "count": 12,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 3,
+    "sold": 35,
+    "created_at": "2026-09-30T06:56:25.687Z",
+    "archived": false,
+    "price": "25000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 11,
+  "fields": {
+    "category": 10,
+    "title": "i7-9700",
+    "description": "8 cores, 4.7 GHz",
+    "count": 6,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 0,
+    "sold": 0,
+    "created_at": "2026-10-09T06:32:41.228Z",
+    "archived": false,
+    "price": "18000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 12,
+  "fields": {
+    "category": 11,
+    "title": "Samsung buds 3",
+    "description": "Беспроводные наушники Samsung",
+    "count": 15,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 0,
+    "sold": 0,
+    "created_at": "2026-10-09T06:32:41.253Z",
+    "archived": false,
+    "price": "12000.00",
+    "sale_price": "10000.00"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 13,
+  "fields": {
+    "category": 11,
+    "title": "Sony WF1000MX5",
+    "description": "Наушники Sony с шумоподавлением",
+    "count": 22,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 0,
+    "sold": 0,
+    "created_at": "2026-10-09T06:32:41.260Z",
+    "archived": false,
+    "price": "22000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 14,
+  "fields": {
+    "category": 11,
+    "title": "Sony WH 10000XM6",
+    "description": "Полноразмерные наушники Sony",
+    "count": 15,
+    "free_delivery": false,
+    "limited": false,
+    "sort_index": 0,
+    "sold": 0,
+    "created_at": "2026-10-09T06:32:41.266Z",
+    "archived": false,
+    "price": "35000.00",
+    "sale_price": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 15,
+  "fields": {
+    "category": 12,
+    "title": "Sumsung tub S10",
+    "description": "Главная особенность серии этого года — Samsung полностью отказалась от базовой (маленькой) версии планшета, сделав ставку на огромные экраны и искусственный интеллект Galaxy AI.",
+    "count": 11,
+    "free_delivery": false,
+    "limited": true,
+    "sort_index": 0,
+    "sold": 0,
+    "created_at": "2026-10-09T06:32:41.289Z",
+    "archived": false,
+    "price": "55000.00",
+    "sale_price": "44000.00"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 11,
+  "fields": {
+    "product": 1,
+    "image": "products/images_5.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 12,
+  "fields": {
+    "product": 2,
+    "image": "products/images_4.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 13,
+  "fields": {
+    "product": 3,
+    "image": "products/images_3.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 14,
+  "fields": {
+    "product": 11,
+    "image": "products/i7-9700-gearvn_effce1dd1dc44616acf69067eb8a3b36_de60e9bfea294d92a3b10e80e33a4370.webp"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 15,
+  "fields": {
+    "product": 5,
+    "image": "products/images_1.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 16,
+  "fields": {
+    "product": 4,
+    "image": "products/images_2.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 17,
+  "fields": {
+    "product": 12,
+    "image": "products/images_7.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 18,
+  "fields": {
+    "product": 13,
+    "image": "products/images_8.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 19,
+  "fields": {
+    "product": 14,
+    "image": "products/images_10.jpeg"
+  }
+},
+{
+  "model": "catalog.productimage",
+  "pk": 20,
+  "fields": {
+    "product": 15,
+    "image": "products/images_11.jpeg"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 90,
+  "fields": {
+    "order": 66,
+    "product": 14,
+    "price": "35000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 91,
+  "fields": {
+    "order": 67,
+    "product": 1,
+    "price": "69000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 92,
+  "fields": {
+    "order": 67,
+    "product": 2,
+    "price": "35000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 93,
+  "fields": {
+    "order": 67,
+    "product": 12,
+    "price": "10000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 94,
+  "fields": {
+    "order": 68,
+    "product": 4,
+    "price": "12000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 95,
+  "fields": {
+    "order": 68,
+    "product": 13,
+    "price": "22000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 96,
+  "fields": {
+    "order": 68,
+    "product": 15,
+    "price": "44000.00",
+    "count": 1
+  }
+},
+{
+  "model": "orders.deliverysettings",
+  "pk": 1,
+  "fields": {
+    "express_price": "1000.00",
+    "free_delivery_threshold": "35000.00",
+    "ordinary_price": "500.00"
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$Z9tlBQAAjYfkJ9fjgky894$InMmZzqAWfskPrMXh4d+NTx69V0/1bQH8qFK0VfQsd4=",
+    "last_login": "2026-10-09T08:04:09.493Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "Jonh",
+    "last_name": "Smith",
+    "email": "admin@mail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-10-01T06:44:20Z",
+    "groups": [
+      [
+        "Администратор"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$GRAWAgZ20JLHxBZe2bcePv$eAdJyStuXkRDtUwQvhR7yjFiTYz7wT4qxdPxMMwOk14=",
+    "last_login": "2026-10-09T08:02:51.872Z",
+    "is_superuser": false,
+    "username": "buyer1",
+    "first_name": "Иван",
+    "last_name": "Иванов",
+    "email": "user1@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-09T07:02:02Z",
+    "groups": [
+      [
+        "Покупатель"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$c3nnsPnSmfE2VrSKJkYcvV$0aUpGiv986HlkuIDaRgkEQEsfXbiWqQi+eu6ai3XmjM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "buyer2",
+    "first_name": "Пётр",
+    "last_name": "Петров",
+    "email": "buyer2@example.com",
+    "is_staff": false,
+    "is_active": false,
+    "date_joined": "2026-10-09T07:02:03.160Z",
+    "groups": [
+      [
+        "Покупатель"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$fpjZXsxR86gD3gvn5CEQPB$dIGeCPahvvZ5mI/0kTlNX8Fyh7xTh+RMGjDBtu7B5Is=",
+    "last_login": "2026-10-09T08:11:48.121Z",
+    "is_superuser": false,
+    "username": "buyer3",
+    "first_name": "Мария",
+    "last_name": "Сидорова",
+    "email": "useruser@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-09T07:02:03Z",
+    "groups": [
+      [
+        "Покупатель"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$BYnW3CRc9sqWxvOzqFcLJ4$KR5/1QeX02oPE6doZ4GEQIZkpXAlMgumb9X687tP8p4=",
+    "last_login": "2026-10-09T08:00:34.338Z",
+    "is_superuser": false,
+    "username": "vasya",
+    "first_name": "Вася",
+    "last_name": "вася",
+    "email": "vasya@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-09T07:24:55.014Z",
+    "groups": [
+      [
+        "Покупатель"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "phone": "79991331333",
+    "avatar": "avatars/4ba04dc6d9b5025c649cd2293217ebb3.jpg",
+    "archived": false
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "buyer1"
+    ],
+    "phone": "+79001112233",
+    "avatar": "avatars/images_tRmPDtJ.jpeg",
+    "archived": false
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "buyer2"
+    ],
+    "phone": "+79004445566",
+    "avatar": "",
+    "archived": false
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "buyer3"
+    ],
+    "phone": "+79007778899",
+    "avatar": "avatars/1648707998_17-kartinkof-club-p-kartinki-smeshnie-vidri-19.jpg",
+    "archived": false
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "vasya"
+    ],
+    "phone": "21343271065",
+    "avatar": "avatars/331493.jpg",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.review",
+  "pk": 6,
+  "fields": {
+    "product": 1,
+    "user": [
+      "buyer1"
+    ],
+    "text": "бомба",
+    "rate": 5,
+    "created_at": "2026-10-09T07:07:39.038Z",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.review",
+  "pk": 7,
+  "fields": {
+    "product": 14,
+    "user": [
+      "buyer1"
+    ],
+    "text": "огонь",
+    "rate": 5,
+    "created_at": "2026-10-09T07:08:00.104Z",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.review",
+  "pk": 8,
+  "fields": {
+    "product": 1,
+    "user": [
+      "buyer3"
+    ],
+    "text": "+",
+    "rate": 5,
+    "created_at": "2026-10-09T07:08:31.581Z",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.review",
+  "pk": 9,
+  "fields": {
+    "product": 12,
+    "user": [
+      "buyer3"
+    ],
+    "text": "мясо",
+    "rate": 5,
+    "created_at": "2026-10-09T07:08:44.221Z",
+    "archived": false
+  }
+},
+{
+  "model": "catalog.review",
+  "pk": 10,
+  "fields": {
+    "product": 11,
+    "user": [
+      "buyer3"
+    ],
+    "text": "woow",
+    "rate": 2,
+    "created_at": "2026-10-09T08:13:09.384Z",
+    "archived": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 66,
+  "fields": {
+    "user": null,
+    "status": "paid",
+    "created_at": "2026-10-09T07:24:20.430Z",
+    "full_name": "Вася вася",
+    "email": "vasya@gmail.com",
+    "phone": "21343271065",
+    "delivery_type": "ordinary",
+    "payment_type": "online",
+    "city": "Gorod",
+    "address": "vot tak",
+    "comment": "",
+    "payment_error": "",
+    "archived": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 67,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "status": "paid",
+    "created_at": "2026-10-09T08:11:02.336Z",
+    "full_name": "Jonh Smith",
+    "email": "admin@mail.com",
+    "phone": "79991331333",
+    "delivery_type": "ordinary",
+    "payment_type": "online",
+    "city": "VietNam",
+    "address": "191 Ba Trieu",
+    "comment": "",
+    "payment_error": "",
+    "archived": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 68,
+  "fields": {
+    "user": [
+      "buyer3"
+    ],
+    "status": "paid",
+    "created_at": "2026-10-09T08:11:59.208Z",
+    "full_name": "Мария Сидорова",
+    "email": "useruser@example.com",
+    "phone": "+79007778899",
+    "delivery_type": "express",
+    "payment_type": "someone",
+    "city": "Beijing",
+    "address": "tata",
+    "comment": "",
+    "payment_error": "",
+    "archived": false
+  }
+}
+]
