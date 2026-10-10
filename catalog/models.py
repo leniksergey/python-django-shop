@@ -12,17 +12,22 @@ class CategoryManager(models.Manager):
 
 class Category(models.Model):
     id: int
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, verbose_name="Название")
     parent = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='subcategories'
+        related_name='subcategories',
+        verbose_name="Родительская категория",
     )
     subcategories: models.QuerySet['Category']
-    image = models.ImageField(upload_to="categories/", blank=True)
-    archived = models.BooleanField(default=False)
+    image = models.ImageField(
+        upload_to="categories/",
+        blank=True,
+        verbose_name="Изображение",
+    )
+    archived = models.BooleanField(default=False, verbose_name="Архивирована")
 
     objects = CategoryManager()
     all_objects = models.Manager()
@@ -42,23 +47,33 @@ class ProductManager(models.Manager):
 
 class Product(models.Model):
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, related_name="products"
+        Category, on_delete=models.PROTECT, related_name="products",
+        verbose_name="Категория",
     )
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    count = models.PositiveIntegerField(default=0)
-    free_delivery = models.BooleanField(default=False)
-    limited = models.BooleanField(default=False)
-    sort_index = models.PositiveIntegerField(default=0)
-    sold = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    archived = models.BooleanField(default=False)
+    title = models.CharField(max_length=200, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    count = models.PositiveIntegerField(default=0, verbose_name="Количество")
+    free_delivery = models.BooleanField(
+        default=False, verbose_name="Бесплатная доставка",
+    )
+    limited = models.BooleanField(
+        default=False, verbose_name="Ограниченный тираж",
+    )
+    sort_index = models.PositiveIntegerField(
+        default=0, verbose_name="Индекс сортировки",
+    )
+    sold = models.PositiveIntegerField(default=0, verbose_name="Продано")
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата создания",
+    )
+    archived = models.BooleanField(default=False, verbose_name="Архивирован")
     objects = ProductManager()
     all_objects = models.Manager()
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
+        verbose_name="Цена",
     )
 
     sale_price = models.DecimalField(
@@ -80,9 +95,10 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(
-        Product, related_name="images", on_delete=models.CASCADE
+        Product, related_name="images", on_delete=models.CASCADE,
+        verbose_name="Товар",
     )
-    image = models.ImageField(upload_to="products/")
+    image = models.ImageField(upload_to="products/", verbose_name="Изображение")
 
     class Meta:
         verbose_name = "Изображение товара"

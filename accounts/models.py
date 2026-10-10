@@ -10,7 +10,8 @@ PHONE_RE = RegexValidator(
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="profile"
+        User, on_delete=models.CASCADE, related_name="profile",
+        verbose_name="Пользователь",
     )
     phone = models.CharField(
         max_length=32,
@@ -32,3 +33,14 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @property
+    def display_name(self):
+        """ФИО или username без @."""
+        full_name = self.user.get_full_name()
+        if full_name:
+            return full_name
+        username = self.user.username
+        if "@" in username:
+            return username.split("@")[0]
+        return username
