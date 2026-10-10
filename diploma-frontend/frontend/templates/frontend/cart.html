@@ -30,7 +30,7 @@
                             <a class="Cart-title" :href="`/product/${product.id}/`">${ product.title }$</a>
                         </div>
                         <div class="Cart-block Cart-block_price">
-                            <div class="Cart-price">${ product.price }$ ₽</div>
+                            <div class="Cart-price">${ product.salePrice || product.price }$ ₽</div>
                         </div>
                     </div>
                     <div class="Cart-block Cart-block_row">

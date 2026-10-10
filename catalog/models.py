@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -51,14 +52,23 @@ class Product(models.Model):
     sort_index = models.PositiveIntegerField(default=0)
     sold = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    archived = models.BooleanField(default=False)
+    objects = ProductManager()
+    all_objects = models.Manager()
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
-    archived = models.BooleanField(default=False)
-    objects = ProductManager()
-    all_objects = models.Manager()
+
+    sale_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal("0.01"))],
+        verbose_name="Цена со скидкой",
+    )
 
     class Meta:
         verbose_name = "Товар"
@@ -80,9 +90,6 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Photo: {self.product}"
-
-
-from django.conf import settings
 
 
 class Review(models.Model):

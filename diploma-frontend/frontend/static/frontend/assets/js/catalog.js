@@ -1,8 +1,8 @@
 var mix = {
     methods: {
-        setTag (id) {
+        setTag(id) {
             this.topTags = this.topTags.map(tag => {
-                return  tag.id === id
+                return tag.id === id
                     ? {
                         ...tag,
                         selected: !tag.selected
@@ -11,7 +11,7 @@ var mix = {
             })
             this.getCatalogs()
         },
-        setSort (id) {
+        setSort(id) {
             if (this.selectedSort?.id === id) {
                 this.selectedSort.selected =
                     this.selectedSort.selected === 'dec'
@@ -30,26 +30,26 @@ var mix = {
             this.getCatalogs()
         },
         getTags() {
-            this.getData('/api/tags', { category: this.category })
+            this.getData('/api/tags', {category: this.category})
                 .then(data => this.topTags = data.map(tag => ({
                     ...tag,
                     selected: false
                 })))
                 .catch(() => {
-                        this.topTags = []
-                        console.warn('Ошибка получения тегов')
+                    this.topTags = []
+                    console.warn('Ошибка получения тегов')
                 })
         },
         getCatalogs(page = 1) {
             const PAGE_LIMIT = 20
             const tags = this.topTags.filter(tag => !!tag.selected).map(tag => tag.id)
             const min = document.querySelector('input[name=minPrice]').value
-            const max =  document.querySelector('input[name=maxPrice]').value
+            const max = document.querySelector('input[name=maxPrice]').value
 
             if (min !== 0) {
                 this.filter.minPrice = min
             }
-            if (max !== 50000) {
+            if (max !== 100000) {
                 this.filter.maxPrice = max
             }
             this.getData("/api/catalog", {
@@ -71,16 +71,16 @@ var mix = {
                     this.lastPage = data.lastPage
 
                 }).catch(() => {
-                    console.warn('Ошибка при получении каталога')
-                })
+                console.warn('Ошибка при получении каталога')
+            })
         }
     },
     mounted() {
         this.selectedSort = this.sortRules?.[1]
-            ? { ...this.sortRules?.[1], selected: 'inc' }
-            :  null
+            ? {...this.sortRules?.[1], selected: 'inc'}
+            : null
 
-        if(location.pathname.startsWith('/catalog/')) {
+        if (location.pathname.startsWith('/catalog/')) {
             const category = location.pathname.replace('/catalog/', '').replace('/', '')
             this.category = category.length ? Number(category) : null
         }
@@ -98,7 +98,7 @@ var mix = {
             filter: {
                 name: '',
                 minPrice: 0,
-                maxPrice: 50000,
+                maxPrice: 100000,
                 freeDelivery: false,
                 available: true
             }
