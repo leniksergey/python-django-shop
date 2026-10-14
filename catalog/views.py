@@ -189,8 +189,8 @@ def product_sale(product: Product):
     return {
         "id": product.pk,
         "title": product.title,
-        "price": float(product.price),
-        "salePrice": float(product.sale_price),
+        "price": float(product.price or 0),
+        "salePrice": float(product.sale_price or 0),
         "images": product_images(product),
     }
 
