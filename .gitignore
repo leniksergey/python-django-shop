@@ -10,3 +10,4 @@ db.sqlite3
 vue-frontend/dist/vue_frontend-0.6/
 vue-frontend/dist/vue-frontend-0.6/
 media/
+.mypy_cache/
