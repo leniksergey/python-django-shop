@@ -14,10 +14,8 @@ def create_admin(apps, schema_editor):
         user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
-            password=None,
+            password='admin123',
         )
-        user.set_password('admin123')
-        user.save()
     else:
         user = User.objects.get(username='admin')
 

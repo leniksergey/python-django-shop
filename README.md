@@ -15,7 +15,7 @@ git clone <repo-url>
 cd python-django-shop
 
 # Виртуальное окружение
-python -m venv venv
+python3 -m venv venv         # на Windows: python -m venv venv
 source venv/bin/activate     # Linux/Mac
 # venv\Scripts\activate      # Windows
 
