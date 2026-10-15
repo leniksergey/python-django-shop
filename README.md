@@ -12,7 +12,7 @@ Django-проект интернет-магазина с Vue-фронтендо�
 
 ```bash
 git clone <repo-url>
-cd python_django_diploma
+cd python-django-shop
 
 # Виртуальное окружение
 python -m venv venv
@@ -23,7 +23,7 @@ source venv/bin/activate     # Linux/Mac
 pip install -r requirements.txt
 
 # Фронтенд (editable-режим)
-cd diploma-frontend
+cd vue-frontend
 pip install -e .
 cd ..
 ```
@@ -59,6 +59,7 @@ docker start shop-redis
 ```bash
 python manage.py migrate
 python manage.py loaddata fixtures/demo.json
+cp -r fixtures/demo_media/. media/
 ```
 
 Фикстура `fixtures/demo.json` добавляет:
@@ -115,15 +116,15 @@ python manage.py runserver 8000
 ## Структура проекта
 
 ```
-python_django_diploma/
+python-django-shop/
 ├── accounts/          # пользователи, профили
 ├── catalog/           # категории, товары, отзывы
 ├── orders/            # заказы, доставка, оплата (Celery)
 ├── shop/              # настройки Django, celery.py
-├── diploma-frontend/  # Vue-фронтенд (editable)
-├── fixtures/          # демо-данные
+├── vue-frontend/  # Vue-фронтенд (editable)
+├── fixtures/          # демо-данные (demo.json, demo_media/)
 ├── docs/              # VALIDATION.md
-├── media/             # загруженные файлы
+├── media/             # загруженные файлы (создаётся локально, в Git не хранится)
 ├── manage.py
 ├── requirements.txt
 ├── .env.example
@@ -132,6 +133,6 @@ python_django_diploma/
 
 ## Ветки
 
-`master` ← `release/stage-N` ← `feature/<название>-api`
+`main` ← `release/stage-N` ← `feature/<название>-api`
 
 Примеры: `feature/catalog-api`, `feature/orders-api`, `feature/accounts-api`.
