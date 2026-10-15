@@ -33,7 +33,7 @@ Python 3.11+, Django, DRF, Celery, Redis, SQLite, Vue, Docker (для Redis), my
 
 ## Требования
 
-- Python 3.11+
+- Python 3.12+ (проверено на 3.14)
 - Docker (для Redis)
 - Git
 
