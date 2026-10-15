@@ -17,6 +17,20 @@ Redis.
 
 Python 3.11+, Django, DRF, Celery, Redis, SQLite, Vue, Docker (для Redis), mypy
 
+## Скриншоты
+
+| Главная | Каталог |
+|---------|---------|
+| ![Главная](docs/screenshots/home.png) | ![Каталог](docs/screenshots/catalog.png) |
+
+| Карточка товара | Корзина |
+|-----------------|---------|
+| ![Товар](docs/screenshots/product.png) | ![Корзина](docs/screenshots/cart.png) |
+
+| Оплата | Профиль |
+|--------|---------|
+| ![Оплата](docs/screenshots/payment.png) | ![Профиль](docs/screenshots/profile.png) |
+
 ## Требования
 
 - Python 3.11+
